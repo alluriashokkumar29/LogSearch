@@ -257,7 +257,7 @@ Key fields in `_raw` JSON:
       "StatusCode": 500,
       "Source": "Error source"
     },
-    "fullRequestUrl": "http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/paymentTransaction/Paypal/validate/3400021622408/3/en-UK",
+    "fullRequestUrl": "http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/paymentTransaction/Paypal/validate/QuoteNumber/QuoteVersion/en-UK",
     "errorId": "unique_error_identifier",
     "eventId": "event_identifier"
   }
@@ -266,7 +266,7 @@ Key fields in `_raw` JSON:
 
 **URL Pattern Example:**
 ```
-http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/paymentTransaction/Paypal/validate/3400021622408/3/en-UK
+http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/paymentTransaction/Paypal/validate/QuoteNumber/QuoteVersion/en-UK
 ```
 - **Quote Number**: 3400021622408
 - **Version**: 3
@@ -280,7 +280,7 @@ Key fields in `_raw` JSON:
   "msg": {
     "responseBody": { "response": "data" },
     "requestBody": { "request": "data" },
-    "fullRequestUrl": "http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/order/createBundledOrder/3700025978808/1/en-cn/premier",
+    "fullRequestUrl": "http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/order/createBundledOrder/QuoteNumber/QuoteVersion/en-cn/premier",
     "requestUrl": "/api/v1/order/createBundledOrder",
     "requestHeaders": { "header": "values" },
     "log_level": "Information"
@@ -290,7 +290,7 @@ Key fields in `_raw` JSON:
 
 **URL Pattern Example:**
 ```
-http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/order/createBundledOrder/3700025978808/1/en-cn/premier
+http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/order/createBundledOrder/QuoteNumber/QuoteVersion/en-cn/premier
 ```
 - **Quote Number**: 3700025978808
 - **Version**: 1
