@@ -990,6 +990,5 @@ Contributions are welcome! Please follow these guidelines:
 Screenshots:
 <img width="1731" height="800" alt="image" src="https://github.com/user-attachments/assets/4069eea1-0ae2-4891-9c8a-9a576d16989d" />
 
-<img width="1731" height="800" alt="image" src="https://github.com/user-attachments/assets/b110f6f8-a316-4104-9f3b-4c6804691481" />
 
 
