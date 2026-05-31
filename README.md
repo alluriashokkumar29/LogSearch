@@ -985,3 +985,8 @@ Contributions are welcome! Please follow these guidelines:
 - Powered by [OpenAI](https://openai.com/)
 - Vector storage by [ChromaDB](https://www.trychroma.com/)
 - Orchestration by [LangChain](https://langchain.com/)
+
+
+Screenshots:
+<img width="1731" height="800" alt="image" src="https://github.com/user-attachments/assets/4069eea1-0ae2-4891-9c8a-9a576d16989d" />
+
