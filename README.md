@@ -166,7 +166,7 @@ streamlit run app.py --server.runOnSave true
    - Status indicator shows "Documents loaded"
 
 2. **Enter Search Criteria**
-   - **Quote Number**: Enter the quote number (e.g., 3400021622408)
+   - **Quote Number**: Enter the quote number (e.g., 3000000000000)
    - **Version**: Enter the version number (e.g., 3)
    - **Document Type**: Select "All", "Error", or "Response" to filter
 
@@ -197,7 +197,7 @@ streamlit run app.py --server.runOnSave true
 
 ```
 1. Upload Today_Errors.json
-2. Enter quote number: 3400021622408
+2. Enter quote number: 3000000000000
 3. Enter version: 3
 4. Select document type: Error
 5. Click Search
@@ -268,7 +268,7 @@ Key fields in `_raw` JSON:
 ```
 http://quote-purchase-bridge-service.g2z1p.pcf.dell.com/api/v1/paymentTransaction/Paypal/validate/QuoteNumber/QuoteVersion/en-UK
 ```
-- **Quote Number**: 3400021622408
+- **Quote Number**: 3000000000000
 - **Version**: 3
 
 ### Regular Response Document Structure (regularResponse.json)
