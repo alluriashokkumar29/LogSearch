@@ -124,14 +124,16 @@ class RAGSystem:
             return []
         
         try:
-            # Build filter
-            filter_dict = {
-                "quote_number": quote_number,
-                "version": version
-            }
+            # Build filter with ChromaDB $and operator syntax
+            filter_conditions = [
+                {"quote_number": {"$eq": quote_number}},
+                {"version": {"$eq": version}}
+            ]
             
             if doc_type:
-                filter_dict["doc_type"] = doc_type
+                filter_conditions.append({"doc_type": {"$eq": doc_type}})
+            
+            filter_dict = {"$and": filter_conditions}
             
             # Search with filter
             results = self.vector_store.similarity_search(
