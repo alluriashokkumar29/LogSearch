@@ -237,7 +237,8 @@ class DataProcessor:
                 "doc_type": doc_type,
                 "_bkt": result_obj.get("_bkt", ""),
                 "_cd": result_obj.get("_cd", ""),
-                "_indextime": result_obj.get("_indextime", "")
+                "_indextime": result_obj.get("_indextime", ""),
+                "_time": result_obj.get("_time", "")
             }
             
             # Prepare text for embedding
