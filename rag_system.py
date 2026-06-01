@@ -108,6 +108,26 @@ class RAGSystem:
             logger.error(f"Failed to index documents: {e}")
             raise
     
+    def _deduplicate(self, documents: List[Document]) -> List[Document]:
+        """Drop chunks that belong to the same source log event.
+
+        Chunks of one document share the Splunk event identifiers
+        (``_bkt``/``_cd``), so we keep only the first chunk per event to
+        avoid returning the same log as several near-identical results.
+        """
+        seen = set()
+        unique: List[Document] = []
+        for doc in documents:
+            metadata = doc.metadata or {}
+            key = (metadata.get("_bkt") or "", metadata.get("_cd") or "")
+            if key == ("", ""):
+                key = ("content", doc.page_content)
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(doc)
+        return unique
+    
     def search_by_quote(
         self, 
         quote_number: str, 
@@ -135,12 +155,13 @@ class RAGSystem:
             
             filter_dict = {"$and": filter_conditions}
             
-            # Search with filter
+            # Over-fetch then dedupe so top_k counts distinct log events
             results = self.vector_store.similarity_search(
                 query=f"quote {quote_number} version {version}",
-                k=config.top_k_results,
+                k=config.top_k_results * 5,
                 filter=filter_dict
             )
+            results = self._deduplicate(results)[:config.top_k_results]
             
             logger.info(f"Found {len(results)} results for quote {quote_number} version {version}")
             return results
@@ -162,10 +183,12 @@ class RAGSystem:
         try:
             k = k or config.top_k_results
             
+            # Over-fetch then dedupe so top_k counts distinct log events
             results = self.vector_store.similarity_search(
                 query=query,
-                k=k
+                k=k * 5
             )
+            results = self._deduplicate(results)[:k]
             
             logger.info(f"Found {len(results)} results for semantic search: {query}")
             return results
