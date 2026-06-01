@@ -44,25 +44,37 @@ class DataProcessor:
             logger.error(f"Unexpected error parsing JSON: {e}")
             raise ValueError(f"Unexpected error parsing JSON: {e}")
     
-    def extract_raw_data(self, result_obj: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Extract and parse the _raw field from result object."""
+    def extract_msg_fields(self, result_obj: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Rebuild the msg object from the flattened ``msg.*`` keys on result.
+
+        The raw log duplicates the message under both ``_raw`` and the
+        flattened ``msg.*`` columns. We rely on the flattened columns so the
+        large ``responseBody`` carried only inside ``_raw`` is not re-indexed.
+        """
         if not isinstance(result_obj, dict):
             logger.debug("Result object is not a dictionary")
             return None
         
-        raw_field = result_obj.get("_raw")
-        if not raw_field:
-            logger.debug("No _raw field found in result object")
+        msg: Dict[str, Any] = {}
+        for key, value in result_obj.items():
+            if not isinstance(key, str) or not key.startswith("msg."):
+                continue
+            
+            path = key[len("msg."):].split(".")
+            node = msg
+            for part in path[:-1]:
+                child = node.get(part)
+                if not isinstance(child, dict):
+                    child = {}
+                    node[part] = child
+                node = child
+            node[path[-1]] = value
+        
+        if not msg:
+            logger.debug("No msg.* fields found in result object")
             return None
         
-        try:
-            return json.loads(raw_field)
-        except json.JSONDecodeError as e:
-            logger.warning(f"Failed to parse _raw field as JSON: {e}")
-            return None
-        except Exception as e:
-            logger.error(f"Unexpected error parsing _raw field: {e}")
-            return None
+        return msg
     
     def identify_document_type(self, msg_obj: Dict[str, Any]) -> str:
         """Determine if document is error or response type."""
@@ -201,16 +213,10 @@ class DataProcessor:
                 logger.debug("No result object found in document")
                 return []
             
-            # Extract raw data
-            raw_data = self.extract_raw_data(result_obj)
-            if not raw_data:
-                logger.debug("No raw data extracted from result object")
-                return []
-            
-            # Get msg object
-            msg_obj = raw_data.get("msg", {})
+            # Build msg object from the flattened msg.* columns (not _raw)
+            msg_obj = self.extract_msg_fields(result_obj)
             if not msg_obj:
-                logger.debug("No msg object found in raw data")
+                logger.debug("No msg fields found in result object")
                 return []
             
             # Identify document type
