@@ -43,6 +43,7 @@ This application provides intelligent search and analysis capabilities for JSON 
 - **Real-time AI Analysis**: Automatic generation of insights from search results
 - **Document Chunking**: Intelligent text chunking for optimal vector embeddings
 - **Metadata Enrichment**: Automatic extraction and indexing of quote information
+- **Result Deduplication**: Automatic deduplication of log events to avoid duplicate results
 - **Session Management**: Stateful handling of uploaded documents across interactions
 - **Comprehensive Error Handling**: Defensive programming with validation at every layer
 - **Logging System**: Detailed logging for debugging and monitoring
@@ -308,6 +309,7 @@ Each document chunk is enriched with the following metadata:
   "_bkt": "bucket_identifier",
   "_cd": "cluster_data",
   "_indextime": "timestamp",
+  "_time": "event_timestamp",
   "chunk_index": 0
 }
 ```
@@ -386,7 +388,7 @@ User Uploads JSON File
     ┌─────────────────────────────────────────────┐
     │         Data Processing Layer                │
     │  - Extract result object                      │
-    │  - Parse _raw field                          │
+    │  - Build msg from flattened columns           │
     │  - Identify document type (error/response)   │
     │  - Extract quote number/version from URL     │
     │  - Prepare metadata                          │
@@ -422,9 +424,11 @@ User Uploads JSON File
     │  - Quote Search:                            │
     │    • Filter by quote_number + version       │
     │    • Optional doc_type filter                │
+    │    • Over-fetch and deduplicate results      │
     │  - Semantic Search:                         │
     │    • Natural language query                  │
     │    • Vector similarity search                │
+    │    • Over-fetch and deduplicate results      │
     └─────────────────────────────────────────────┘
          ↓
     ┌─────────────────────────────────────────────┐
@@ -475,7 +479,7 @@ User Uploads JSON File
 │  • parse_json_file() - Validate JSON structure             │
 │  • For each document:                                       │
 │    - process_document()                                     │
-│      • extract_raw_data() - Parse _raw field               │
+│      • extract_msg_fields() - Build msg from flattened columns │
 │      • identify_document_type() - error vs response        │
 │      • extract_quote_info() - Regex URL parsing            │
 │      • prepare_for_embedding() - Flatten text              │
@@ -763,7 +767,7 @@ class DataProcessor:
     """Handles JSON parsing and data extraction for log documents."""
     
     def parse_json_file(self, file_content: str) -> List[Dict[str, Any]]
-    def extract_raw_data(self, result_obj: Dict[str, Any]) -> Optional[Dict[str, Any]]
+    def extract_msg_fields(self, result_obj: Dict[str, Any]) -> Optional[Dict[str, Any]]
     def identify_document_type(self, msg_obj: Dict[str, Any]) -> str
     def extract_quote_info(self, url: str) -> Tuple[Optional[str], Optional[str]]
     def prepare_for_embedding(self, document: Dict[str, Any], doc_type: str) -> str
@@ -783,6 +787,7 @@ class RAGSystem:
     def __init__(self)
     def create_vector_store(self, persist_directory: Optional[str] = None)
     def index_documents(self, chunks: List[DocumentChunk])
+    def _deduplicate(self, documents: List[Document]) -> List[Document]
     def search_by_quote(self, quote_number: str, version: str, doc_type: Optional[str] = None) -> List[Document]
     def semantic_search(self, query: str, k: Optional[int] = None) -> List[Document]
     def generate_answer(self, query: str, context: str) -> str
